@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# Encoding: utf-8
+# Cloud Foundry Java Buildpack
+# Copyright 2013-2016 the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.2
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+$stdout.sync = true
+$stderr.sync = true
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+require 'java_buildpack/buildpack'
+
+
+build_dir = ARGV[0]
+cache_dir = ARGV[1]
+
+system("echo " + cache_dir)
+system("wget -nc 'http://nlp.stanford.edu/software/stanford-english-corenlp-2016-01-10-models.jar' -P " +cache_dir)
+system("cp "+cache_dir+"/stanford-english-corenlp-2016-01-10-models.jar "+build_dir+"/WEB-INF/lib")
+
+
+JavaBuildpack::Buildpack.with_buildpack(build_dir, 'Compile failed with exception %s') do |buildpack|
+  buildpack.compile
+end
